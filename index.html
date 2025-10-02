@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A professional financial planning website with articles and calculators for smart money management.">
-    <title>News Hub</title>
+    <title>Smart Finance Planner</title>
 
-    <!-- Canonical link tag -->
+    <!-- Canonical link tag to prevent duplicate content issues.
+    Be sure to update the href with your actual website URL. -->
     <link rel="canonical" href="https://yourwebsite.com/index.html"> 
 
     <!-- Open Graph Meta Tags for social media sharing -->
@@ -16,41 +17,6 @@
     <meta property="og:url" content="https://yourwebsite.com/index.html">
     <meta property="og:type" content="website">
 
-    <!-- Schema.org Structured Data (JSON-LD) for search engines -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@graph": [
-          {
-            "@type": "WebSite",
-            "name": "Smart Finance Planner",
-            "url": "https://yourwebsite.com",
-            "about": "A guide to financial planning and freedom.",
-            "description": "A professional financial planning website with articles and calculators for smart money management."
-          },
-          {
-            "@type": "Article",
-            "headline": "The Roadmap to Financial Freedom: A 1000-Word Guide",
-            "description": "A practical, step-by-step roadmap to help you navigate the journey toward true financial independence.",
-            "image": "https://img.freepik.com/free-photo/finance-concept_23-2148165794.jpg",
-            "author": {
-              "@type": "Person",
-              "name": "Financial Planner"
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "Smart Finance Planner",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://yourwebsite.com/logo.png"
-              }
-            },
-            "datePublished": "2025-09-22"
-          }
-        ]
-      }
-    </script>
-    
     <!-- Tailwind CSS CDN for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for a clean, professional font -->
@@ -64,81 +30,131 @@
             display: none;
         }
 
-        .calc-button {
-            transition: transform 0.1s ease-in-out;
-        }
-        .calc-button:active {
-            transform: scale(0.98);
+        /* Notification Modal styles */
+        .notification-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
         }
 
-        .card-grid {
-             min-height: 50vh; /* Ensure some space even if content is loading */
+        .notification-modal-content {
+            background-color: #fff;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .notification-modal-overlay.show {
+            display: flex;
+        }
+        .notification-modal-overlay.show .notification-modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        /* Toast styles */
+        #subscriptionToast {
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        #subscriptionToast.show {
+            transform: scale(1) translateX(-50%);
+            opacity: 1;
         }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
     <!-- Header -->
-    <header class="bg-blue-600 text-white py-8 md:py-12 shadow-lg relative">
+    <header class="bg-blue-600 text-white py-8 shadow-xl relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight">News Hub</h1>
-            <p class="mt-4 text-lg sm:text-xl font-light opacity-90">Explore articles and use our tools to plan your future.</p>
-            <!-- User ID Display (moved from the now-removed notification modal) -->
-            <p id="userIdDisplay" class="text-xs text-blue-200 mt-2 break-all">User ID: Connecting...</p>
+            <p class="mt-2 text-xl sm:text-2xl font-light opacity-90">Your daily dose of Finance, Tech, and Entertainment.</p>
         </div>
-        <nav class="mt-6 md:mt-4 flex justify-center items-center">
-            <ul class="flex space-x-6 md:space-x-10 text-white">
-                <!-- Navigation items call showCategory() -->
-                <li><a href="#" id="nav-finance" class="text-lg font-medium hover:text-blue-200 transition-colors duration-300 border-b-2 border-white pb-1" onclick="event.preventDefault(); showCategory('finance');">Finance</a></li>
-                <li><a href="#" id="nav-technology" class="text-lg font-medium hover:text-blue-200 transition-colors duration-300 pb-1" onclick="event.preventDefault(); showCategory('technology');">Technology</a></li>
-                <li><a href="#" id="nav-entertainment" class="text-lg font-medium hover:text-blue-200 transition-colors duration-300 pb-1" onclick="event.preventDefault(); showCategory('entertainment');">Entertainment</a></li>
-                <li><a href="#" id="nav-calculator" class="text-lg font-medium hover:text-blue-200 transition-colors duration-300 pb-1" onclick="event.preventDefault(); showCalculator();">Calculator</a></li>
+        <nav class="mt-4 flex justify-center items-center">
+            <ul class="flex space-x-4 md:space-x-8 text-white">
+                <li><a href="#" data-category="finance" class="nav-link text-lg font-bold border-b-4 border-transparent hover:border-white transition-colors duration-300 pb-1">Finance</a></li>
+                <li><a href="#" data-category="technology" class="nav-link text-lg font-bold border-b-4 border-transparent hover:border-white transition-colors duration-300 pb-1">Technology</a></li>
+                <li><a href="#" data-category="entertainment" class="nav-link text-lg font-bold border-b-4 border-transparent hover:border-white transition-colors duration-300 pb-1">Entertainment</a></li>
             </ul>
         </nav>
-        <!-- Subscription button -->
-        <div class="absolute top-4 right-4 flex items-center space-x-3 sm:space-x-4">
-            <button id="subscribeBtn" class="bg-white text-blue-600 py-2 px-4 rounded-full text-sm font-semibold hover:bg-gray-100 transition-colors duration-200">
-                Subscribe to Updates
+        <!-- Notification icon and subscribe button -->
+        <div class="absolute top-4 right-4 flex items-center space-x-4">
+            <button id="subscribeBtn" class="bg-white text-blue-600 py-2 px-4 rounded-full text-sm font-semibold hover:bg-gray-100 transition-colors duration-200 shadow-md">
+                Subscribe to All Updates
+            </button>
+            <button id="notificationBtn" class="relative text-white hover:text-blue-200 transition-colors duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-2h-2v2zm0-4h2V7h-2v6z"/>
+                </svg>
+                <span id="notificationBadge" class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full border-2 border-white transform translate-x-1 -translate-y-1 hidden"></span>
             </button>
         </div>
+        <p id="userIdDisplay" class="absolute bottom-1 left-4 text-xs text-blue-200 opacity-70 break-all"></p>
     </header>
 
     <!-- Subscription Confirmation Toast -->
-    <div id="subscriptionToast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-green-600 text-white py-3 px-6 rounded-lg shadow-xl z-50 transform scale-0 opacity-0 transition-all duration-300 ease-out">
-        You are now successfully subscribed!
+    <div id="subscriptionToast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-green-600 text-white py-3 px-6 rounded-lg shadow-lg z-50 opacity-0 transition-all duration-300 ease-out">
+        आप अब सफलतापूर्वक सब्सक्राइब हो गए हैं! (Subscribed Successfully!)
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="notification-modal-overlay">
+        <div class="notification-modal-content">
+            <h3 class="text-2xl font-bold mb-4">New Update! <span id="notificationCategory" class="text-sm font-medium text-blue-500 bg-blue-100 px-2 py-1 rounded-full ml-2"></span></h3>
+            <p id="notificationMessage" class="text-gray-600 mb-6"></p>
+            <div class="mt-6 flex justify-center space-x-4">
+                <a id="readNowBtn" href="#" target="_blank" class="bg-blue-600 text-white py-2 px-6 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md">
+                    Read Now
+                </a>
+                <button id="closeNotificationBtn" class="bg-gray-200 text-gray-700 py-2 px-6 rounded-full font-semibold hover:bg-gray-300 transition-colors duration-200 shadow-md">
+                    Close
+                </button>
+            </div>
+        </div>
     </div>
     
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         <!-- Articles Section -->
-        <section id="articleSection">
+        <section id="articlesSection">
             <h2 id="sectionTitle" class="text-3xl font-bold text-center text-gray-900 mb-8">Finance Articles</h2>
-            <!-- Loading Indicator -->
-             <div id="loadingIndicator" class="text-center text-gray-500 font-semibold mb-8">
-                 Loading Articles...
-             </div>
-            <div class="card-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="blogCards" style="display:none;">
+            <div class="card-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="blogCards">
                 <!-- Cards will be generated dynamically -->
+                <p id="loadingMessage" class="col-span-full text-center text-gray-500">Loading articles...</p>
             </div>
         </section>
 
         <!-- Dynamic Article Container -->
-        <div id="articleContainer" class="bg-white rounded-xl shadow-2xl p-6 md:p-10 mt-12 transition-all duration-300" style="display:none;">
+        <div id="articleContainer" class="bg-white rounded-xl shadow-2xl p-8 mt-12 transition-all duration-300" style="display:none;">
             <div class="mb-8">
-                <img id="articleImage" src="" alt="Article image" onerror="this.onerror=null;this.src='https://placehold.co/800x400/3B82F6/ffffff?text=Article+Image';" class="w-full h-64 md:h-96 object-cover rounded-xl shadow-md">
+                <img id="articleImage" src="" alt="Article image" class="w-full h-72 object-cover rounded-xl shadow-md" onerror="this.onerror=null; this.src='https://placehold.co/1200x300/e5e7eb/374151?text=Image+Unavailable';">
             </div>
-            <div class="article-content text-base md:text-lg leading-relaxed">
-                <h2 id="articleTitle" class="text-3xl md:text-4xl font-bold text-blue-600 mb-6"></h2>
+            <div class="article-content text-lg leading-relaxed">
+                <h2 id="articleTitle" class="text-4xl font-bold text-blue-600 mb-4"></h2>
                 <div id="articleText" class="prose max-w-none text-gray-700"></div>
             </div>
-            <div id="navButtons" class="flex justify-between mt-8 flex-col sm:flex-row space-y-4 sm:space-y-0">
-                <button id="backBtn" class="flex items-center justify-center space-x-2 bg-gray-200 text-gray-700 py-3 px-6 rounded-full font-semibold hover:bg-gray-300 transition-colors duration-200">
+            <div id="navButtons" class="flex justify-between mt-8">
+                <button id="backBtn" class="flex items-center space-x-2 bg-gray-200 text-gray-700 py-3 px-6 rounded-full font-semibold hover:bg-gray-300 transition-colors duration-200 shadow-md">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                     </svg>
                     <span>Back to Articles</span>
                 </button>
-                <button id="nextBtn" class="flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 px-6 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200">
+                <button id="nextBtn" class="flex items-center space-x-2 bg-blue-600 text-white py-3 px-6 rounded-full font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md">
                     <span>Next Article</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -155,41 +171,41 @@
             <div class="flex flex-col lg:flex-row space-y-8 lg:space-y-0 lg:space-x-8">
 
                 <!-- SIP Calculator -->
-                <div class="calculator-card flex-1 bg-blue-50 p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
-                    <h3 class="text-2xl font-semibold text-blue-800 mb-6">SIP Calculator</h3>
-                    <div class="calculator-input mb-6">
-                        <label for="sipAmount" class="block font-medium mb-2 text-gray-700">Monthly Investment (₹):</label>
-                        <input type="number" id="sipAmount" value="5000" class="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                <div class="calculator-card flex-1 bg-blue-50 p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-semibold text-blue-800 mb-6">SIP Calculator (Systematic Investment Plan)</h3>
+                    <div class="calculator-input mb-4">
+                        <label for="sipAmount" class="block font-medium mb-2">Monthly Investment (₹):</label>
+                        <input type="number" id="sipAmount" value="5000" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                     </div>
-                    <div class="calculator-input mb-6">
-                        <label for="sipReturn" class="block font-medium mb-2 text-gray-700">Expected Return Rate (% p.a.):</label>
-                        <input type="number" id="sipReturn" value="12" class="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                    <div class="calculator-input mb-4">
+                        <label for="sipReturn" class="block font-medium mb-2">Expected Return Rate (% p.a.):</label>
+                        <input type="number" id="sipReturn" value="12" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                     </div>
                     <div class="calculator-input mb-8">
-                        <label for="sipYears" class="block font-medium mb-2 text-gray-700">Time Period (Years):</label>
-                        <input type="number" id="sipYears" value="10" class="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                        <label for="sipYears" class="block font-medium mb-2">Time Period (Years):</label>
+                        <input type="number" id="sipYears" value="10" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                     </div>
-                    <button class="calc-button w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition-colors" onclick="calculateSIP()">Calculate SIP</button>
-                    <div class="calculator-result mt-6 text-xl font-bold space-y-2" id="sipResult"></div>
+                    <button id="sipCalcBtn" class="calc-button w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-md">Calculate SIP</button>
+                    <div class="calculator-result mt-6 text-center text-lg font-bold p-3 bg-blue-100 rounded-lg" id="sipResult"></div>
                 </div>
 
                 <!-- Lumpsum Calculator -->
-                <div class="calculator-card flex-1 bg-blue-50 p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
+                <div class="calculator-card flex-1 bg-blue-50 p-6 rounded-xl shadow-lg">
                     <h3 class="text-2xl font-semibold text-blue-800 mb-6">Lumpsum Calculator</h3>
-                    <div class="calculator-input mb-6">
-                        <label for="lumpsumAmount" class="block font-medium mb-2 text-gray-700">Total Investment (₹):</label>
-                        <input type="number" id="lumpsumAmount" value="100000" class="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                    <div class="calculator-input mb-4">
+                        <label for="lumpsumAmount" class="block font-medium mb-2">Total Investment (₹):</label>
+                        <input type="number" id="lumpsumAmount" value="100000" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                     </div>
-                    <div class="calculator-input mb-6">
-                        <label for="lumpsumReturn" class="block font-medium mb-2 text-gray-700">Expected Return Rate (% p.a.):</label>
-                        <input type="number" id="lumpsumReturn" value="12" class="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                    <div class="calculator-input mb-4">
+                        <label for="lumpsumReturn" class="block font-medium mb-2">Expected Return Rate (% p.a.):</label>
+                        <input type="number" id="lumpsumReturn" value="12" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                     </div>
                     <div class="calculator-input mb-8">
-                        <label for="lumpsumYears" class="block font-medium mb-2 text-gray-700">Time Period (Years):</label>
-                        <input type="number" id="lumpsumYears" value="10" class="w-full p-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                        <label for="lumpsumYears" class="block font-medium mb-2">Time Period (Years):</label>
+                        <input type="number" id="lumpsumYears" value="10" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
                     </div>
-                    <button class="calc-button w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition-colors" onclick="calculateLumpsum()">Calculate Lumpsum</button>
-                    <div class="calculator-result mt-6 text-xl font-bold space-y-2" id="lumpsumResult"></div>
+                    <button id="lumpsumCalcBtn" class="calc-button w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-md">Calculate Lumpsum</button>
+                    <div class="calculator-result mt-6 text-center text-lg font-bold p-3 bg-blue-100 rounded-lg" id="lumpsumResult"></div>
                 </div>
             </div>
         </section>
@@ -197,14 +213,14 @@
     </main>
 
     <footer class="mt-12 py-8 bg-gray-100 text-center text-gray-500 text-sm">
-        <p class="max-w-4xl mx-auto px-4">Disclaimer: This website and its content are for informational and educational purposes only. The calculators and articles are not intended to be and do not constitute financial advice. You should not make any financial decisions based on the information provided here without consulting a qualified financial professional.</p>
+        <p>Disclaimer: This website and its content are for informational and educational purposes only. The calculators and articles are not intended to be and do not constitute financial advice. You should not make any financial decisions based on the information provided here without consulting a qualified financial professional.</p>
     </footer>
 
     <script type="module">
         // Firebase imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Enable Firestore debug logging
@@ -215,393 +231,467 @@
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // State variables
+        // Initialize Firebase
         let app;
         let db;
         let auth;
         let userId = '';
-        let userHasSubscribed = false;
+        let isAuthReady = false;
         let currentCategory = 'finance';
+        let articlesInCurrentCategory = [];
         let currentArticleIndex = -1;
+        let userHasSubscribed = false;
 
-        // DOM Elements
-        const blogCards = document.getElementById('blogCards');
-        const articleSection = document.getElementById('articleSection');
-        const articleContainer = document.getElementById('articleContainer');
-        const calculatorSection = document.getElementById('calculatorSection');
+        // --- DOM Elements ---
         const sectionTitle = document.getElementById('sectionTitle');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const userIdDisplay = document.getElementById('userIdDisplay');
-        const subscribeBtn = document.getElementById('subscribeBtn');
-        const subscriptionToast = document.getElementById('subscriptionToast');
-        const navLinks = {
-            'finance': document.getElementById('nav-finance'),
-            'technology': document.getElementById('nav-technology'),
-            'entertainment': document.getElementById('nav-entertainment'),
-            'calculator': document.getElementById('nav-calculator')
-        };
+        const blogCards = document.getElementById('blogCards');
+        const articleContainer = document.getElementById('articleContainer');
+        const articleTitleEl = document.getElementById('articleTitle');
+        const articleTextEl = document.getElementById('articleText');
+        const articleImageEl = document.getElementById('articleImage');
         const backBtn = document.getElementById('backBtn');
         const nextBtn = document.getElementById('nextBtn');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const calculatorSection = document.getElementById('calculatorSection');
 
-        // All articles content
-        const articles = [
+        const notificationBadge = document.getElementById('notificationBadge');
+        const notificationModal = document.getElementById('notificationModal');
+        const notificationMessage = document.getElementById('notificationMessage');
+        const notificationCategory = document.getElementById('notificationCategory');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const readNowBtn = document.getElementById('readNowBtn');
+        const closeNotificationBtn = document.getElementById('closeNotificationBtn');
+        const subscribeBtn = document.getElementById('subscribeBtn');
+        const subscriptionToast = document.getElementById('subscriptionToast');
+
+        // --- Data (Articles) ---
+        const allArticles = [
             // Finance Articles
-            { id: 1, category: "finance", title: "3 Smart Financial Planning Tips for Beginners", content: "<p>Financial planning is a crucial step that can help you secure your future and achieve your goals. Here are 3 easy and smart financial tips for beginners:</p><h3>1.Budgeting: The First Step to Taking Control</h3><p>1. Track Your Money: You can't manage what you don't measure. Start by understanding your monthly cash flow. List all your sources of income and every single expense, from your rent to that daily coffee. This will give you a clear picture of your financial habits.</h3><p>2. Make a Budget That Works: Use the 50/30/20 rule—50% for needs, 30% for wants, 20% for savings/debt.</p><h3>3. Get Rid of High-Interest Debts</h3><p>3.Pay Yourself First: Save a portion of income before spending.</p>", image: "https://img.freepik.com/free-photo/finance-concept_23-2148165794.jpg" },
-            { id: 2, category: "finance", title: "How to Create a Monthly Budget That Actually Works", content: "<p>Creating an effective monthly budget is both an art and a science. It's a tool that can help you take control of your money. Follow the steps below:</p><h3>1. Find Your Monthly Income</h3><p>Add up your total income from all sources. This includes your salary, freelancing income, or any other regular income.</p><h3>2. Track All Your Expenses</h3><p>Record every expense you make for a month. This includes things like rent, electricity bills, groceries, and entertainment.</p><h3>3. Implement the 50/30/20 Rule</h3><p>This is a simple budgeting rule. Spend 50% of your income on \"Needs,\" 30% on \"Wants,\" and put 20% towards \"Savings & Debt.\"</p><h3>4. Customize the Budget</h3><p>Adjust your budget according to your goals and lifestyle. If you are saving for a house, you can increase the savings portion.</p><h3>5. Review Regularly</h3><p>Review your budget monthly. See where you were successful and where you need to improve. This will help you stay on track.</p>", image: "https://img.freepik.com/free-photo/budget-planning_23-2148127345.jpg" },
-            { id: 3, category: "finance", title: "Top 7 Investment Options for 2025", content: "<p>There are many investment options. Based on your financial goals and risk tolerance, you can choose from these top 7 options:</p><h3>1. Mutual Funds</h3><p>The most popular option for small investors. You can invest small amounts regularly through SIPs.</p><h3>2. Stock Market</h3><p>High return potential, but also high risk. Choose stocks of good companies for long-term investment.</p><h3>3. Government Schemes</h3><p>Options like Public Provident Fund (PPF) and National Pension Scheme (NPS) provide safe and tax-free returns.</p><h3>4. Real Estate</h3><p>A long-standing investment option. Buying property can give you both rental income and capital appreciation.</p><h3>5. Gold</h3><p>Considered a safe investment, especially during times of economic uncertainty. You can invest in physical gold or Sovereign Gold Bonds.</p><h3>6. Fixed Deposits</h3><p>A safe option for low-risk investors. You can open a fixed deposit with a bank or post office.</p><h3>7. Bonds and Debentures</h3><p>You can earn a fixed income by lending to a company or government. These are less volatile compared to mutual funds and stocks.</p>", image: "https://img.freepik.com/free-photo/indian-stock-market_23-2148189452.jpg" },
-            { id: 4, category: "finance", title: "How to Build an Emergency Fund: A Complete Guide", content: "<p>An emergency fund is a financial safety net that prepares you for unexpected expenses.</p><h3>Why is it important?</h3><p>An emergency fund covers unexpected expenses like job loss, medical emergencies, or home repairs. It saves you from taking out a loan.</p><h3>How much should you save?</h3><p>Financial advisors suggest that you should save an amount equal to 3 to 6 months of living expenses.</p><h3>Where to keep the money?</h3><p>Keep it in a high-yield savings account or a short-term fixed deposit. It should be easily accessible.</p><h3>How to start?</h3><p>Set aside a fixed amount from your budget every month. Do this right after you get your salary. Start small and gradually reach your goal.</p>", image: "https://img.freepik.com/free-photo/saving-money-jar_23-2148134278.jpg" },
-            { id: 5, category: "finance", title: "Retirement Planning: How Much Should You Save by Age?", content: "<p>Planning for retirement is a long journey, and the earlier you start, the better. Here are some savings tips according to your age:</p><h3>In your 20s: Start as early as possible</h3><p>At this age, you can take full advantage of the magic of compounding. Start saving 10% to 15% of your income for retirement. Investing in a SIP or a mutual fund is a good option.</p><h3>In your 30s: Increase your savings</h3><p>Your income is likely to increase in this decade. Increase your savings to 15% to 20%. Continue to invest in equity according to your risk tolerance.</p><h3>In your 40s: Review your goals</h3><p>Now is the time to review your retirement goals and see if you are on the right track. Try to increase your savings rate to 20% to 25%. Also, consider making your portfolio a little more stable.</p><h3>In your 50s: Finalize your strategy</h3><p>At this time, your goal should be to grow your savings and make your investment strategy risk-free. Start putting money into more secure investment options, such as fixed deposits or bonds.</p><h3>Conclusion</h3><p>No matter what your age is, the most important thing is to start today. Consistent savings and the right investments will help you ensure a secure retirement.</p>", image: "https://img.freepik.com/free-photo/retirement-planning-concept_23-2148165787.jpg" },
-            { id: 6, category: "finance", title: "Best Tax-Saving Investments Under Section 80C", content: "<p>Section 80C of the Indian Income Tax Act allows you to save tax on investments up to ₹1.5 lakhs. Here are some popular options:</p><h3>1. Equity Linked Savings Scheme (ELSS)</h3><p>ELSS is a type of mutual fund that invests in stocks. Its lock-in period is only 3 years and it can give good returns in the long run.</p><h3>2. Public Provident Fund (PPF)</h3><p>PPF is a government scheme that provides safe and tax-free returns. Its lock-in period is 15 years and it is a good option for those who do not want to take risks.</p><h3>3. National Pension Scheme (NPS)</h3><p>NPS is a retirement plan that helps you build a large fund in the long run. It also gets additional tax benefits under Section 80C.</p><h3>4. Term Insurance</h3><p>Term insurance premiums are also tax-deductible under Section 80C. It is an essential financial safety net for your family.</p><h3>5. Fixed Deposits (Tax-Saving FDs)</h3><p>These FDs offered by banks and post offices come with a 5-year lock-in period and provide safe returns.</p>", image: "https://img.freepik.com/free-photo/tax-saving-india_23-2148291889.jpg" },
-            { id: 7, category: "finance", title: "How to Improve Your Credit Score Fast", content: "<p>Your credit score determines whether you will get a loan or credit card in the future. Take these steps to improve it quickly:</p><h3>1. Pay your bills on time</h3><p>This is the most important factor of a credit score. Pay your credit card bills and loan EMIs on time.</p><h3>2. Keep your credit utilization low</h3><p>Do not use more than 30% of your total credit card limit. For example, if your credit limit is ₹1 lakh, do not spend more than ₹30,000.</p><h3>3. Keep old credit lines open</h3><p>Do not close your oldest credit cards, as this can reduce the length of your credit history.</p><h3>4. Check your credit report</h3><p>Regularly check your credit report and immediately correct any mistakes or errors.</p><h3>5. Avoid unnecessary new loans</h3><p>Do not apply for new credit cards or loans frequently. This can have a negative impact on your score.</p>", image: "https://img.freepik.com/free-photo/credit-score-india_23-2148291782.jpg" },
-            { id: 8, category: "finance", title: "Why Term Insurance is a Must for Financial Security", content: "<p>Term insurance is a pure life insurance plan that provides financial security to your family for a fixed term. It is an investment that everyone should have.</p><h3>Low Cost, High Coverage</h3><p>The biggest feature of term insurance is its low premium cost. You can get a large amount of life cover by paying a small premium.</p><h3>Family Protection</h3><p>In the unfortunate event of your demise, the policy amount is given to your family. This helps your family remain financially independent and secures their future.</p><h3>Debt Repayment</h3><p>If you have a home loan or other loans, term insurance ensures that your family does not have to struggle to repay those loans after you.</p><h3>Tax Benefits</h3><p>Term insurance premiums are tax-deductible under Section 80C, and the maturity amount is also tax-free.</p>", image: "https://img.freepik.com/free-photo/insurance-concept_23-2148165739.jpg" },
-            { id: 9, category: "finance", title: "Top 5 Passive Income Ideas to Grow Your Wealth", content: "<p>Passive income is income you receive with little active participation. It's a great way to grow your wealth quickly.</p><h3>1. Dividend Stocks and Mutual Funds</h3><p>Invest in the stock market and choose shares of companies that pay regular dividends. This can become a source of regular income for you.</p><h3>2. Real Estate</h3><p>Earn rental income from rented property. This is a stable and reliable source of passive income.</p><h3>3. Blogging or a YouTube Channel</h3><p>Share your knowledge and passion on a blog or YouTube channel. Once your audience grows, you can earn through advertisements, sponsorships, and affiliate marketing.</p><h3>4. Peer-to-Peer Lending</h3><p>Lend to other individuals through a digital platform and earn interest. This is a new and attractive option.</p><h3>5. Sell Digital Products</h3><p>Create and sell digital products like e-books, online courses, or stock photos. Once created, they can be sold again and again.</p>", image: "https://img.freepik.com/free-photo/passive-income-ideas_23-2148189712.jpg" },
-            { id: 10, category: "finance", title: "Financial Mistakes to Avoid in Your 20s and 30s", content: "<p>Your 20s and 30s are crucial for laying the foundation of your financial future. Avoid these common mistakes:</p><h3>1. Delaying Savings</h3><p>Starting to save and invest early gives you the full benefit of compounding. Avoid the mindset of \"I'll do it tomorrow.\"</p><h3>2. Taking Expensive Loans</h3><p>Avoid high-interest loans like credit card debt or personal loans. They can become the biggest hurdle in your financial progress.</p><h3>3. Not Building an Emergency Fund</h3><p>Without an emergency fund, unexpected expenses can force you to take out a loan. Start saving from your salary immediately.</p><h3>4. Ignoring Insurance</h3><p>Consider health and term insurance as an investment, not an expense. It protects you from financial crises.</p><h3>5. Spending More Than Your Income</h3><p>Stick to your budget. Do not spend on unnecessary things due to social pressure.</p>", image: "https://img.freepik.com/free-photo/young-adults-financial-mistakes_23-2148165769.jpg" },
-            
-            // Technology Articles (New)
-            { id: 11, category: "technology", title: "The Future of AI in Everyday Life", content: "<p>Artificial Intelligence is no longer a futuristic concept; it's being integrated into our daily lives. From smart home devices to personalized recommendations on streaming platforms, AI is everywhere. The next decade will see AI become even more seamless, anticipating our needs and automating complex tasks, transforming everything from healthcare to transportation.</p><h3>AI in Healthcare</h3><p>AI is being used to analyze medical images, predict disease outbreaks, and even assist in surgery. This is leading to faster diagnoses and more personalized treatment plans for patients.</p><h3>AI in Transportation</h3><p>Self-driving cars are just the beginning. AI is set to revolutionize logistics, public transit, and even air travel, making it safer and more efficient.</p><h3>AI and Personalization</h3><p>Imagine a smart assistant that not only organizes your calendar but also suggests the most efficient way to achieve your goals based on your habits. AI will take personalization to a new level, making our lives more convenient.</p>", image: "https://img.freepik.com/free-photo/ai-human-hand-touching-cyborg-s-hand-glowing-blue-light_23-2149479344.jpg" },
-            { id: 12, category: "technology", title: "The Rise of Quantum Computing", content: "<p>Quantum computing uses the principles of quantum mechanics to process information, allowing it to solve problems that are currently impossible for even the most powerful supercomputers. While still in its infancy, it holds the potential to revolutionize fields like cryptography, drug discovery, and material science.</p><h3>How is it Different?</h3><p>Classical computers use bits (0s and 1s) to store data. Quantum computers use qubits, which can represent 0, 1, or both at the same time, thanks to a property called superposition. This allows them to perform complex calculations at an exponential speed.</p><h3>Challenges Ahead</h3><p>Despite its promise, quantum computing faces significant challenges, including the need for extremely low temperatures and the fragility of qubits. However, ongoing research is making rapid progress, bringing a quantum future closer to reality.</p>", image: "https://img.freepik.com/free-photo/quantum-computer-processor_23-2149187654.jpg" },
-            { id: 13, category: "technology", title: "Cybersecurity Best Practices for 2025", content: "<p>As our digital world expands, so do cybersecurity threats. Protecting your personal and financial data is more critical than ever. Here are some key best practices to follow in 2025.</p><h3>1. Use Strong, Unique Passwords</h3><p>Avoid using simple passwords or reusing the same password across multiple sites. Use a password manager to securely store complex, unique passwords for all your accounts.</p><h3>2. Enable Multi-Factor Authentication (MFA)</h3><p>MFA adds an extra layer of security, requiring a second form of verification (like a code from your phone) in addition to your password. This is one of the most effective ways to protect your accounts from unauthorized access.</p><h3>3. Be Cautious of Phishing Scams</h3><p>Phishing attacks are becoming increasingly sophisticated. Never click on suspicious links or provide sensitive information via email or text messages.</p><h3>4. Keep Software Updated</h3><p>Regularly update your operating system, web browser, and all applications. Updates often contain critical security patches that protect against known vulnerabilities.</p>", image: "https://img.freepik.com/free-photo/cyber-security-best-practices_23-2149187654.jpg" },
-            { id: 14, category: "entertainment", title: "The Evolution of Streaming Services", content: "<p>Streaming services have fundamentally changed how we consume media. From niche platforms focused on specific genres to massive libraries covering everything, the competition is fierce. The future points towards a consolidation of services or more specialized, high-quality content that justifies multiple subscriptions.</p><h3>The Binge-Watching Era</h3><p>The ability to watch entire seasons at once created a cultural shift, leading to massive production investment in original, high-quality series.</p><h3>The Rise of Live Content</h3><p>Live sports and events are becoming the next battleground, as they are one of the few forms of content that require real-time viewing, driving subscription rates.</p><h3>Personalized Discovery</h3><p>AI-driven recommendation engines are constantly improving, ensuring viewers spend less time searching and more time watching content tailored to their tastes.</p>", image: "https://img.freepik.com/free-photo/streaming-services_23-2149187654.jpg" },
-            { id: 15, category: "entertainment", title: "Top 5 Upcoming Movies to Watch in Q4", content: "<p>The final quarter of the year is traditionally reserved for Oscar contenders and major blockbusters. Here are the top 5 must-watch movies hitting the big screen.</p><h3>1. Historical Epic: 'The Last Kingdom'</h3><p>A gripping tale of war and betrayal set in medieval times, promising stunning visuals and intense drama.</p><h3>2. Sci-Fi Thriller: 'Aether Drift'</h3><p>Following a lone astronaut on a mission to save Earth, this film is expected to be a mind-bending journey with incredible special effects.</p><h3>3. Animated Feature: 'Petal Power'</h3><p>From the studio that brought you 'Toy Story,' this new animated adventure is already getting buzz for its heartwarming story and unique art style.</p><h3>4. Psychological Horror: 'Silent Night'</h3><p>A minimalist horror movie that relies on atmosphere and sound design to deliver scares, perfect for the Halloween season.</p><h3>5. Family Comedy: 'Grandpa's Gadgets'</h3><p>A lighthearted comedy about a retired inventor whose wild creations go haywire when his grandchildren visit for the summer.</p>", image: "https://img.freepik.com/free-photo/upcoming-movies_23-2149187654.jpg" }
+            { id: 1, category: "finance", title: "5 Smart Financial Planning Tips for Beginners", content: "<p>One of the steps that can make you certain of your future and attainment of your goals is financial planning. The 3 simple and genius tips of financial beginners are as follows:</p><h3>1. First Budgeting: Take control the First Step.</h3><p>2. Track Your Money: There is no way you can manage something you do not measure. The first thing to be done is to know how much cash you are collecting in a month. Write down the name of all of your sources of income and each and every expense, vaguely as your rent, to that cup of coffee. This will bring you a realistic impression of your financial patterns.</p><h3>3. Prepare a Budget That Works: Use the 50/ 30/ 20 rule, 50 equals needs, 30 equals wants, 20 equals savings or debt.</h3><p>4. Debts with High Interest Rates</p><p>5. Pay Yourself First: Save a small amount of money and then spend it first.</p>", image: "https://placehold.co/1200x630/2563EB/ffffff?text=Finance+Tips" },
+            { id: 2, category: "finance", title: "How to Create a Monthly Budget That Actually Works", content: "<p>Creating an effective monthly budget is both an art and a science. It's a tool that can help you take control of your money. Follow the steps below:</p><h3>1. Find Your Monthly Income</h3><p>Add up your total income from all sources. This includes your salary, freelancing income, or any other regular income.</p><h3>2. Track All Your Expenses</h3><p>Record every expense you make for a month. This includes things like rent, electricity bills, groceries, and entertainment.</p><h3>3. Implement the 50/30/20 Rule</h3><p>This is a simple budgeting rule. Spend 50% of your income on \"Needs,\" 30% on \"Wants,\" and put 20% towards \"Savings & Debt.\"</p><h3>4. Customize the Budget</h3><p>Adjust your budget according to your goals and lifestyle. If you are saving for a house, you can increase the savings portion.</p><h3>5. Review Regularly</h3><p>Review your budget monthly. See where you were successful and where you need to improve. This will help you stay on track.</p>", image: "https://placehold.co/1200x630/60A5FA/ffffff?text=Budget+Works" },
+            { id: 3, category: "finance", title: "Top 7 Investment Options for 2025", content: "<p>There are many investment options. Based on your financial goals and risk tolerance, you can choose from these top 7 options:</p><h3>1. Mutual Funds</h3><p>The most popular option for small investors. You can invest small amounts regularly through SIPs.</p><h3>2. Stock Market</h3><p>High return potential, but also high risk. Choose stocks of good companies for long-term investment.</p><h3>3. Government Schemes</h3><p>Options like Public Provident Fund (PPF) and National Pension Scheme (NPS) provide safe and tax-free returns.</p><h3>4. Real Estate</h3><p>A long-standing investment option. Buying property can give you both rental income and capital appreciation.</p><h3>5. Gold</h3><p>Considered a safe investment, especially during times of economic uncertainty. You can invest in physical gold or Sovereign Gold Bonds.</p><h3>6. Fixed Deposits</h3><p>A safe option for low-risk investors. You can open a fixed deposit with a bank or post office.</p><h3>7. Bonds and Debentures</h3><p>You can earn a fixed income by lending to a company or government. These are less volatile compared to mutual funds and stocks.</p>", image: "https://placehold.co/1200x630/10B981/ffffff?text=Investments" },
+            { id: 11, category: "technology", title: "The Future of AI in Everyday Life", content: "<p>Artificial Intelligence is no longer a futuristic concept; it's being integrated into our daily lives. From smart home devices to personalized recommendations on streaming platforms, AI is everywhere. The next decade will see AI become even more seamless, anticipating our needs and automating complex tasks, transforming everything from healthcare to transportation.</p><h3>AI in Healthcare</h3><p>AI is being used to analyze medical images, predict disease outbreaks, and even assist in surgery. This is leading to faster diagnoses and more personalized treatment plans for patients.</p><h3>AI in Transportation</h3><p>Self-driving cars are just the beginning. AI is set to revolutionize logistics, public transit, and even air travel, making it safer and more efficient.</p><h3>AI and Personalization</h3><p>Imagine a smart assistant that not only organizes your calendar but also suggests the most efficient way to achieve your goals based on your habits. AI will take personalization to a new level, making our lives more convenient.</p>", image: "https://placehold.co/1200x630/F59E0B/ffffff?text=Future+of+AI" },
+            { id: 12, category: "technology", title: "The Rise of Quantum Computing", content: "<p>Quantum computing uses the principles of quantum mechanics to process information, allowing it to solve problems that are currently impossible for even the most powerful supercomputers. While still in its infancy, it holds the potential to revolutionize fields like cryptography, drug discovery, and material science.</p><h3>How is it Different?</h3><p>Classical computers use bits (0s and 1s) to store data. Quantum computers use qubits, which can represent 0, 1, or both at the same time, thanks to a property called superposition. This allows them to perform complex calculations at an exponential speed.</p><h3>Challenges Ahead</h3><p>Despite its promise, quantum computing faces significant challenges, including the need for extremely low temperatures and the fragility of qubits. However, ongoing research is making rapid progress, bringing a quantum future closer to reality.</p>", image: "https://placehold.co/1200x630/EF4444/ffffff?text=Quantum+Tech" },
+            { id: 13, category: "technology", title: "Cybersecurity Best Practices for 2025", content: "<p>As our digital world expands, so do cybersecurity threats. Protecting your personal and financial data is more critical than ever. Here are some key best practices to follow in 2025.</p><h3>1. Use Strong, Unique Passwords</h3><p>Avoid using simple passwords or reusing the same password across multiple sites. Use a password manager to securely store complex, unique passwords for all your accounts.</p><h3>2. Enable Multi-Factor Authentication (MFA)</h3><p>MFA adds an extra layer of security, requiring a second form of verification (like a code from your phone) in addition to your password.</p><h3>3. Keep Software Updated</h3><p>Regularly update your operating system and applications. Updates often include critical security patches that protect against new vulnerabilities.</p>", image: "https://placehold.co/1200x630/8B5CF6/ffffff?text=Cyber+Security" },
+            { id: 14, category: "entertainment", title: "The Revival of Vinyl Records and Analog Media", content: "<p>In an increasingly digital world, there's a growing nostalgia and appreciation for analog media. The sales of vinyl records have surpassed CDs, and even cassette tapes are seeing a niche revival. This trend is driven by a desire for a tangible, high-quality audio experience and a connection to music history.</p><h3>The Audio Quality Debate</h3><p>Many audiophiles argue that the warmth and richness of analog sound cannot be replicated digitally. The process of listening to a vinyl record—cleaning it, dropping the needle—also adds a ritualistic element that enhances the experience.</p><h3>Collecting and Culture</h3><p>The rise of vinyl is also a cultural phenomenon. Collecting records has become a hobby, and local record stores have re-emerged as community hubs for music lovers.</p>", image: "https://placehold.co/1200x630/EC4899/ffffff?text=Vinyl+Revival" },
+            { id: 15, category: "entertainment", title: "Top 5 Must-Watch Streaming Series of the Year", content: "<p>The streaming wars are heating up, providing an overwhelming amount of high-quality content. Here are the top five series everyone is talking about this year, ranging from gripping dramas to innovative science fiction:</p><h3>1. The Time Weaver (Sci-Fi)</h3><p>A complex narrative exploring parallel dimensions and time travel. Known for its stunning visuals and philosophical depth.</p><h3>2. The Corporate Ladder (Drama)</h3><p>A high-stakes drama detailing the cutthroat world of corporate finance, featuring incredible performances and intense plot twists.</p><h3>3. Midnight Garden (Mystery)</h3><p>A cozy mystery series set in a quiet European town, focusing on clever detective work and character development.</p><h3>4. Culinary Clash (Reality)</h3><p>A cooking competition show that challenges chefs with bizarre ingredients and historical recipes.</p><h3>5. Nebula's Children (Animation)</h3><p>A critically acclaimed adult animated series that blends dark humor with deep emotional themes about family and legacy.</p>", image: "https://placehold.co/1200x630/3B82F6/ffffff?text=Streaming+Hits" },
         ];
 
-        /**
-         * Firebase Utility Functions
-         */
-        
-        // Get the Firestore path for the user's private data
-        // MUST be defined before it is called in initializeUserData()
-        const getUserDocRef = (uid) => doc(db, 'artifacts', appId, 'users', uid, 'settings', 'subscription');
+
+        // --- Utility Functions ---
 
         /**
-         * UI Functions (defined before Firebase initialization calls them)
+         * Formats a number as a currency string (Indian Rupees).
+         * @param {number} amount
+         * @returns {string}
          */
+        const formatCurrency = (amount) => {
+            if (isNaN(amount)) return '₹0';
+            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
+        };
 
         /**
-         * Shows a toast notification.
-         * @param {string} message 
-         * @param {string} type 
+         * Hides the article view and shows the main card grid.
          */
-        function showToast(message, type = 'success') {
-            subscriptionToast.textContent = message;
-            subscriptionToast.classList.remove('bg-green-600', 'bg-red-600');
-            if (type === 'error') {
-                subscriptionToast.classList.add('bg-red-600');
-            } else {
-                subscriptionToast.classList.add('bg-green-600');
-            }
-
-            subscriptionToast.classList.remove('scale-0', 'opacity-0');
-            subscriptionToast.classList.add('scale-100', 'opacity-100');
-
-            setTimeout(() => {
-                subscriptionToast.classList.remove('scale-100', 'opacity-100');
-                subscriptionToast.classList.add('scale-0', 'opacity-0');
-            }, 3000);
-        }
-        
-        /**
-         * Updates the subscription button text and style.
-         * @param {boolean} subscribed 
-         */
-        function updateSubscribeButton(subscribed) {
-            if (subscribed) {
-                subscribeBtn.textContent = 'Subscribed!';
-                subscribeBtn.classList.remove('bg-white', 'text-blue-600', 'hover:bg-gray-100');
-                subscribeBtn.classList.add('bg-green-500', 'text-white', 'hover:bg-green-600', 'cursor-default');
-                subscribeBtn.disabled = true;
-            } else {
-                subscribeBtn.textContent = 'Subscribe to Updates';
-                subscribeBtn.classList.remove('bg-green-500', 'text-white', 'hover:bg-green-600', 'cursor-default');
-                subscribeBtn.classList.add('bg-white', 'text-blue-600', 'hover:bg-gray-100');
-                subscribeBtn.disabled = false;
-            }
-        }
-        
-        /**
-         * Renders the full article view.
-         * @param {number} index - Index of the article in the filtered array.
-         * @param {string} category 
-         */
-        function viewArticle(index, category) {
-            const filteredArticles = articles.filter(a => a.category === category);
-            currentArticleIndex = index;
-            const article = filteredArticles[index];
-
-            if (!article) return;
-            
-            // Hide article list and calculator, show article container
-            blogCards.style.display = 'none';
-            articleContainer.style.display = 'block';
-            calculatorSection.classList.add('hidden');
-            sectionTitle.textContent = 'In-Depth Article';
-
-
-            document.getElementById('articleImage').src = article.image;
-            document.getElementById('articleTitle').textContent = article.title;
-            document.getElementById('articleText').innerHTML = article.content;
-
-            // Update navigation buttons
-            backBtn.onclick = () => showCategory(category); // Back always goes to the category list
-            nextBtn.onclick = () => viewArticle((index + 1) % filteredArticles.length, category);
-            nextBtn.style.display = filteredArticles.length > 1 ? 'flex' : 'none';
-        }
-
-        /**
-         * Renders the articles for the given category.
-         * @param {string} category 
-         */
-        window.showCategory = (category) => {
-            currentCategory = category;
-            currentArticleIndex = -1; // Reset index when changing category
-            
-            // UI visibility
-            articleSection.style.display = 'block';
+        const showCardGrid = () => {
             articleContainer.style.display = 'none';
-            calculatorSection.classList.add('hidden');
-            loadingIndicator.style.display = 'block';
-            blogCards.style.display = 'none';
-            
-            // Update nav highlighting
-            Object.values(navLinks).forEach(link => link.classList.remove('border-b-2', 'border-white', 'pb-1'));
-            if (navLinks[category]) {
-                navLinks[category].classList.add('border-b-2', 'border-white', 'pb-1');
-            }
-            if (navLinks['calculator']) {
-                 navLinks['calculator'].classList.remove('border-b-2', 'border-white', 'pb-1');
-            }
+            blogCards.parentElement.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
 
-            // Update title
+        /**
+         * Renders the article cards for the current category.
+         * @param {string} category
+         */
+        const displayArticles = (category) => {
+            currentCategory = category;
+            articlesInCurrentCategory = allArticles.filter(a => a.category === category);
+
+            // Update Header and Calculator Visibility
             sectionTitle.textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Articles`;
-
-            // Filter and render cards
-            const filteredArticles = articles.filter(a => a.category === category);
-            blogCards.innerHTML = '';
             
-            if (filteredArticles.length === 0) {
-                 blogCards.innerHTML = '<p class="text-center text-gray-500 col-span-full">No articles found for this category.</p>';
-                 loadingIndicator.style.display = 'none';
-                 blogCards.style.display = 'grid';
-                 return;
+            if (category === 'finance') {
+                calculatorSection.classList.remove('hidden');
+            } else {
+                calculatorSection.classList.add('hidden');
             }
 
+            // Render Cards
+            blogCards.innerHTML = '';
+            showCardGrid(); // Ensure we are on the card view
 
-            filteredArticles.forEach((article, index) => {
+            if (articlesInCurrentCategory.length === 0) {
+                blogCards.innerHTML = `<p class="col-span-full text-center text-gray-500 py-10">No articles found in the ${category} category yet.</p>`;
+                return;
+            }
+
+            articlesInCurrentCategory.forEach(article => {
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-1';
+                card.className = 'bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer';
+                card.dataset.id = article.id;
+                
                 card.innerHTML = `
-                    <img src="${article.image}" alt="${article.title}" onerror="this.onerror=null;this.src='https://placehold.co/400x200/3B82F6/ffffff?text=Article+Image';" class="w-full h-48 object-cover">
+                    <img src="${article.image}" alt="${article.title}" class="w-full h-48 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/600x400/e5e7eb/374151?text=Image+Unavailable';">
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">${article.title}</h3>
-                        <p class="text-gray-600 text-sm line-clamp-3">${article.content.replace(/<[^>]*>?/gm, '').substring(0, 100)}...</p>
-                        <span class="mt-4 inline-block text-blue-600 font-medium hover:text-blue-700">Read Article →</span>
+                        <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full mb-2">${article.category.toUpperCase()}</span>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">${article.title}</h3>
+                        <p class="text-gray-600 text-sm">${article.content.substring(0, 100).replace(/<[^>]*>?/gm, '')}...</p>
+                        <button class="mt-4 text-blue-600 font-semibold text-sm hover:text-blue-800 transition-colors">Read More &rarr;</button>
                     </div>
                 `;
-                // Add click handler to view the full article
-                card.onclick = () => viewArticle(index, category);
                 blogCards.appendChild(card);
             });
-            
-            loadingIndicator.style.display = 'none';
-            blogCards.style.display = 'grid';
-        }
 
-        /**
-         * Switches the view to the calculators section.
-         */
-        window.showCalculator = () => {
-             // UI visibility
-            articleSection.style.display = 'block'; // Keep article section around for article viewing
-            articleContainer.style.display = 'none';
-            blogCards.style.display = 'none';
-            loadingIndicator.style.display = 'none';
-            calculatorSection.classList.remove('hidden');
-
-            // Update nav highlighting
-            Object.values(navLinks).forEach(link => link.classList.remove('border-b-2', 'border-white', 'pb-1'));
-            if (navLinks['calculator']) {
-                navLinks['calculator'].classList.add('border-b-2', 'border-white', 'pb-1');
-            }
-            
-            // Update title
-            sectionTitle.textContent = 'Financial Tools';
-        }
-        
-        /**
-         * Calculator Logic (attached to window for direct use in HTML)
-         */
-
-        /**
-         * Calculates SIP maturity value.
-         */
-        window.calculateSIP = () => {
-            const P = parseFloat(document.getElementById('sipAmount').value); // Monthly investment
-            const R = parseFloat(document.getElementById('sipReturn').value) / 100 / 12; // Monthly rate
-            const T = parseFloat(document.getElementById('sipYears').value) * 12; // Total months
-            const resultDiv = document.getElementById('sipResult');
-
-            if (isNaN(P) || isNaN(R) || isNaN(T) || P <= 0 || T <= 0) {
-                resultDiv.innerHTML = '<p class="text-red-600">Please enter valid numbers.</p>';
-                return;
-            }
-
-            // M = P * [ (1+R)^N - 1 ] / R * (1+R)
-            const M = P * ((Math.pow(1 + R, T) - 1) / R) * (1 + R);
-            const investedAmount = P * T;
-            const estimatedReturns = M - investedAmount;
-
-            resultDiv.innerHTML = `
-                <p class="text-gray-700 font-normal">Invested Amount: <span class="text-blue-600 font-bold">₹${Math.round(investedAmount).toLocaleString('en-IN')}</span></p>
-                <p class="text-gray-700 font-normal">Est. Returns: <span class="text-green-600 font-bold">₹${Math.round(estimatedReturns).toLocaleString('en-IN')}</span></p>
-                <p class="text-2xl mt-4 text-gray-900">Total Value: <span class="text-blue-800 font-extrabold">₹${Math.round(M).toLocaleString('en-IN')}</span></p>
-            `;
-        }
-        
-        /**
-         * Calculates Lumpsum maturity value.
-         */
-        window.calculateLumpsum = () => {
-            const P = parseFloat(document.getElementById('lumpsumAmount').value); // Initial investment
-            const R = parseFloat(document.getElementById('lumpsumReturn').value) / 100; // Annual rate
-            const T = parseFloat(document.getElementById('lumpsumYears').value); // Total years
-            const resultDiv = document.getElementById('lumpsumResult');
-
-            if (isNaN(P) || isNaN(R) || isNaN(T) || P <= 0 || T <= 0) {
-                resultDiv.innerHTML = '<p class="text-red-600">Please enter valid numbers.</p>';
-                return;
-            }
-
-            // A = P * (1 + R)^T
-            const A = P * Math.pow(1 + R, T);
-            const estimatedReturns = A - P;
-
-            resultDiv.innerHTML = `
-                <p class="text-gray-700 font-normal">Invested Amount: <span class="text-blue-600 font-bold">₹${Math.round(P).toLocaleString('en-IN')}</span></p>
-                <p class="text-gray-700 font-normal">Est. Returns: <span class="text-green-600 font-bold">₹${Math.round(estimatedReturns).toLocaleString('en-IN')}</span></p>
-                <p class="text-2xl mt-4 text-gray-900">Total Value: <span class="text-blue-800 font-extrabold">₹${Math.round(A).toLocaleString('en-IN')}</span></p>
-            `;
-        }
-
-        /**
-         * Firebase Data Functions
-         */
-
-        /**
-         * Initializes user subscription status.
-         */
-        async function initializeUserData() {
-            if (!userId || !db) return;
-
-            // 1. Check User Subscription Status
-            try {
-                const userDocRef = getUserDocRef(userId);
-                const docSnap = await getDoc(userDocRef);
-                
-                if (docSnap.exists() && docSnap.data().subscribed === true) {
-                    userHasSubscribed = true;
-                    updateSubscribeButton(true);
-                } else {
-                    userHasSubscribed = false;
-                    updateSubscribeButton(false);
+            // Update active navigation link styling
+            navLinks.forEach(link => {
+                link.classList.remove('border-white');
+                if (link.dataset.category === category) {
+                    link.classList.add('border-white');
                 }
-            } catch (e) {
-                console.error("Error fetching user subscription status:", e);
-                // Assume not subscribed on error
-                updateSubscribeButton(false);
-            }
-        }
-
+            });
+        };
 
         /**
-         * Toggles subscription status in Firebase.
+         * Displays the full content of a specific article.
+         * @param {number} articleId
          */
-        async function toggleSubscription() {
-            if (!userId || !db) {
-                console.error("Cannot toggle subscription: User not authenticated or Firestore not initialized.");
+        const showArticle = (articleId) => {
+            const article = allArticles.find(a => a.id === articleId);
+            if (!article) return;
+
+            // Hide cards and show article container
+            blogCards.parentElement.style.display = 'none';
+            articleContainer.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Populate content
+            articleTitleEl.textContent = article.title;
+            articleTextEl.innerHTML = article.content;
+            articleImageEl.src = article.image;
+            articleImageEl.alt = article.title;
+
+            currentArticleIndex = articlesInCurrentCategory.findIndex(a => a.id === articleId);
+            
+            // Update navigation buttons visibility
+            backBtn.disabled = currentArticleIndex <= 0;
+            nextBtn.disabled = currentArticleIndex >= articlesInCurrentCategory.length - 1;
+
+            backBtn.classList.toggle('opacity-50', backBtn.disabled);
+            nextBtn.classList.toggle('opacity-50', nextBtn.disabled);
+        };
+
+
+        // --- Calculator Logic (Attached to window for inline onclick compatibility) ---
+
+        window.calculateSIP = () => {
+            const P = parseFloat(document.getElementById('sipAmount').value); // Monthly Investment
+            const r_annual = parseFloat(document.getElementById('sipReturn').value) / 100; // Annual Rate
+            const t = parseFloat(document.getElementById('sipYears').value); // Time in Years
+
+            if (isNaN(P) || isNaN(r_annual) || isNaN(t) || P <= 0 || t <= 0) {
+                document.getElementById('sipResult').textContent = "Please enter valid positive numbers.";
                 return;
             }
 
-            // We only handle subscription (setting it to true) for simplicity
-            if (userHasSubscribed) {
-                // If already subscribed, just toast the success again or do nothing
-                showToast("You are already subscribed!");
+            const r_monthly = r_annual / 12; // Monthly Rate
+            const n_months = t * 12; // Total Months
+
+            // Future Value of SIP formula: FV = P * [((1 + r)^n - 1) / r] * (1 + r)
+            const FV = P * ((Math.pow(1 + r_monthly, n_months) - 1) / r_monthly) * (1 + r_monthly);
+            const totalInvested = P * n_months;
+            const estimatedReturn = FV - totalInvested;
+
+            document.getElementById('sipResult').innerHTML = `
+                <div class="text-sm font-normal text-gray-700">Total Investment: <span class="font-semibold">${formatCurrency(totalInvested)}</span></div>
+                <div class="text-sm font-normal text-gray-700">Estimated Returns: <span class="font-semibold">${formatCurrency(estimatedReturn)}</span></div>
+                <div class="text-xl mt-2 text-blue-700">Future Value: <span class="font-extrabold">${formatCurrency(FV)}</span></div>
+            `;
+        };
+
+        window.calculateLumpsum = () => {
+            const P = parseFloat(document.getElementById('lumpsumAmount').value); // Principal
+            const r = parseFloat(document.getElementById('lumpsumReturn').value) / 100; // Annual Rate
+            const t = parseFloat(document.getElementById('lumpsumYears').value); // Time in Years
+
+            if (isNaN(P) || isNaN(r) || isNaN(t) || P <= 0 || t <= 0) {
+                document.getElementById('lumpsumResult').textContent = "Please enter valid positive numbers.";
                 return;
             }
 
+            // Compound Interest Formula: A = P(1 + r)^t
+            const FV = P * Math.pow(1 + r, t);
+            const estimatedReturn = FV - P;
+
+            document.getElementById('lumpsumResult').innerHTML = `
+                <div class="text-sm font-normal text-gray-700">Total Investment: <span class="font-semibold">${formatCurrency(P)}</span></div>
+                <div class="text-sm font-normal text-gray-700">Estimated Returns: <span class="font-semibold">${formatCurrency(estimatedReturn)}</span></div>
+                <div class="text-xl mt-2 text-blue-700">Future Value: <span class="font-extrabold">${formatCurrency(FV)}</span></div>
+            `;
+        };
+
+
+        // --- Firebase/Firestore Logic ---
+
+        /**
+         * Saves the user's subscription status to Firestore.
+         */
+        const updateUserSubscription = async (isSubscribed) => {
+            if (!db || !userId) {
+                console.error("Firestore or User ID not ready for subscription update.");
+                return;
+            }
             try {
-                const userDocRef = getUserDocRef(userId);
-                
-                // Set the subscription status to true
+                // Private user document: /artifacts/{appId}/users/{userId}/user_preferences/current_user
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/user_preferences/current_user`);
                 await setDoc(userDocRef, { 
-                    subscribed: true,
-                    timestamp: new Date().toISOString() 
+                    isSubscribed: isSubscribed,
+                    updatedAt: Date.now()
                 }, { merge: true });
 
-                userHasSubscribed = true;
-                updateSubscribeButton(true);
-                showToast("Subscription successful! Welcome aboard!");
+                console.log(`Subscription status updated successfully to: ${isSubscribed}`);
+                userHasSubscribed = isSubscribed;
+                updateSubscribeButtonUI(isSubscribed);
 
-            } catch (e) {
-                console.error("Error updating subscription status:", e);
-                showToast("Subscription failed. Please try again.", 'error');
-            }
-        }
-
-
-        /**
-         * Firebase Initialization and Authentication
-         */
-        try {
-            if (Object.keys(firebaseConfig).length > 0) {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        userIdDisplay.textContent = `User ID: ${userId}`;
-                        console.log("Firebase Auth: Signed in with UID:", userId);
-                        
-                        // Check if the user is already subscribed and initialize listeners
-                        await initializeUserData();
-                        // Load initial content
-                        showCategory(currentCategory); 
-                    } else {
-                        // Sign in anonymously if no auth token is provided
-                        await signInAnonymously(auth);
-                        // The onAuthStateChanged listener will fire again with the new user
-                    }
-                });
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    // Start authentication process if not already started by token
-                    if (!auth.currentUser) {
-                         await signInAnonymously(auth);
-                    }
+                if (isSubscribed) {
+                    showToast();
                 }
 
-            } else {
-                console.error("Firebase Config is missing or empty.");
-                // Fallback: load content without Firebase functionality
-                showCategory(currentCategory);
+            } catch (e) {
+                console.error("Error updating user subscription:", e);
             }
-        } catch (error) {
-            console.error("Firebase setup failed:", error);
-            // Fallback: load content without Firebase functionality
-            showCategory(currentCategory);
-        }
+        };
 
         /**
-         * Event Listeners
+         * Sets up the real-time listener for the latest global notification.
          */
+        const setupNotificationListener = () => {
+            if (!db) {
+                console.error("Firestore not ready for notification listener.");
+                return;
+            }
+
+            // Public document: /artifacts/{appId}/public/data/notifications/latest
+            const notificationDocRef = doc(db, `artifacts/${appId}/public/data/notifications/latest`);
+
+            onSnapshot(notificationDocRef, (docSnap) => {
+                if (docSnap.exists() && isAuthReady) {
+                    const latestNotification = docSnap.data();
+                    
+                    // The badge is shown if:
+                    // 1. The user is globally subscribed OR
+                    // 2. The notification category matches the current view.
+                    const matchesCategory = latestNotification.category && latestNotification.category.toLowerCase() === currentCategory.toLowerCase();
+                    
+                    if (userHasSubscribed || matchesCategory) {
+                        notificationBadge.classList.remove('hidden');
+                        notificationModal.dataset.title = latestNotification.title || "New Update";
+                        notificationModal.dataset.message = latestNotification.message || "You have a new update.";
+                        notificationModal.dataset.category = latestNotification.category || "General";
+                        notificationModal.dataset.link = latestNotification.link || "#";
+                    } else {
+                        notificationBadge.classList.add('hidden');
+                    }
+                } else {
+                    notificationBadge.classList.add('hidden');
+                }
+            }, (error) => {
+                console.error("Error listening to notifications:", error);
+            });
+        };
+
+        /**
+         * Fetches and applies the initial user preferences.
+         */
+        const loadUserPreferences = async () => {
+            if (!db || !userId) return;
+
+            try {
+                const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/user_preferences/current_user`);
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    userHasSubscribed = data.isSubscribed === true;
+                } else {
+                    // Create a default preference document if none exists
+                    await updateUserSubscription(false);
+                }
+                updateSubscribeButtonUI(userHasSubscribed);
+            } catch (e) {
+                console.error("Error loading user preferences:", e);
+            }
+        };
         
-        // Subscribe button handler
-        subscribeBtn.addEventListener('click', toggleSubscription);
+        // --- UI Update Functions ---
+        
+        /**
+         * Shows the subscription success toast.
+         */
+        const showToast = () => {
+            subscriptionToast.classList.add('show');
+            setTimeout(() => {
+                subscriptionToast.classList.remove('show');
+            }, 3000);
+        };
+
+        /**
+         * Updates the subscribe button text and color based on subscription status.
+         */
+        const updateSubscribeButtonUI = (isSubscribed) => {
+            if (isSubscribed) {
+                subscribeBtn.textContent = 'Subscribed (Thank You!)';
+                subscribeBtn.classList.remove('bg-white', 'text-blue-600');
+                subscribeBtn.classList.add('bg-green-500', 'text-white');
+                subscribeBtn.disabled = true;
+            } else {
+                subscribeBtn.textContent = 'Subscribe to All Updates';
+                subscribeBtn.classList.remove('bg-green-500', 'text-white');
+                subscribeBtn.classList.add('bg-white', 'text-blue-600');
+                subscribeBtn.disabled = false;
+            }
+        };
+
+        /**
+         * Shows the notification modal.
+         */
+        const showNotificationModal = () => {
+            const title = notificationModal.dataset.title;
+            const message = notificationModal.dataset.message;
+            const category = notificationModal.dataset.category;
+            const link = notificationModal.dataset.link;
+            
+            notificationMessage.textContent = message;
+            notificationCategory.textContent = category;
+            readNowBtn.href = link;
+
+            notificationModal.classList.add('show');
+            notificationBadge.classList.add('hidden'); // Hide badge after user opens modal
+        };
+
+        /**
+         * Hides the notification modal.
+         */
+        const hideNotificationModal = () => {
+            notificationModal.classList.remove('show');
+        };
+
+
+        // --- Event Listeners and Initialization ---
+
+        // 1. Firebase Initialization and Authentication
+        window.onload = async () => {
+            if (Object.keys(firebaseConfig).length > 0) {
+                try {
+                    app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+                } catch (e) {
+                    console.error("Failed to initialize Firebase:", e);
+                }
+            } else {
+                console.warn("Firebase config is missing. Services will not be available.");
+                // Still run UI initialization even if Firebase is missing
+                isAuthReady = true;
+                displayArticles(currentCategory);
+                return; 
+            }
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // User is signed in (anonymous or custom token)
+                    userId = user.uid;
+                } else if (initialAuthToken) {
+                    // Sign in with provided custom token
+                    try {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                        userId = auth.currentUser.uid;
+                    } catch (error) {
+                        console.error("Custom token sign-in failed:", error);
+                        // Fallback to anonymous sign-in
+                        await signInAnonymously(auth);
+                        userId = auth.currentUser.uid;
+                    }
+                } else {
+                    // Fallback to anonymous sign-in
+                    await signInAnonymously(auth);
+                    userId = auth.currentUser.uid;
+                }
+                
+                isAuthReady = true;
+                userIdDisplay.textContent = `User ID: ${userId}`;
+                await loadUserPreferences(); // Load subscription status
+                setupNotificationListener(); // Start listening for notifications
+                displayArticles(currentCategory); // Initial load of articles
+            });
+        };
+
+
+        // 2. Navigation Link Handlers
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const newCategory = link.dataset.category;
+                if (newCategory !== currentCategory) {
+                    displayArticles(newCategory);
+                }
+            });
+        });
+
+        // 3. Article Card Click Handler
+        blogCards.addEventListener('click', (e) => {
+            const card = e.target.closest('[data-id]');
+            if (card) {
+                const articleId = parseInt(card.dataset.id);
+                showArticle(articleId);
+            }
+        });
+
+        // 4. Article Navigation (Back/Next)
+        backBtn.addEventListener('click', () => {
+            if (currentArticleIndex > 0) {
+                showArticle(articlesInCurrentCategory[currentArticleIndex - 1].id);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentArticleIndex < articlesInCurrentCategory.length - 1) {
+                showArticle(articlesInCurrentCategory[currentArticleIndex + 1].id);
+            }
+        });
+
+        // 5. Back to Articles Button
+        document.getElementById('backBtn').addEventListener('click', showCardGrid);
+
+
+        // 6. Subscription and Notification UI Handlers
+        subscribeBtn.addEventListener('click', () => {
+            if (!userHasSubscribed) {
+                updateUserSubscription(true);
+            }
+        });
+
+        notificationBtn.addEventListener('click', () => {
+            if (notificationBadge.classList.contains('hidden') && !notificationModal.classList.contains('show')) {
+                // If the badge is hidden and the modal is closed, there's no new notification to show, do nothing.
+                console.log("No new notification to display.");
+                return;
+            }
+            showNotificationModal();
+        });
+
+        closeNotificationBtn.addEventListener('click', hideNotificationModal);
+        readNowBtn.addEventListener('click', hideNotificationModal);
+
+        // Initial setup for calculators (in case the onclick attributes fail)
+        document.getElementById('sipCalcBtn').addEventListener('click', window.calculateSIP);
+        document.getElementById('lumpsumCalcBtn').addEventListener('click', window.calculateLumpsum);
+
+        // Initial calculator run on load for default values
+        document.addEventListener('DOMContentLoaded', () => {
+            window.calculateSIP();
+            window.calculateLumpsum();
+        });
 
     </script>
-
 </body>
 </html>
